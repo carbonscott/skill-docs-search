@@ -16,25 +16,26 @@ description: Strategy guide for searching local documentation collections. Use w
 
 Use `docs-index search` for **discovery**, then `Read` the top results. Use `Grep` when you need **precision** on a known pattern.
 
-## Environment Setup
-
-Source the skill environment before any command:
-
-```bash
-source <this-skill-dir>/env.sh
-```
-
-This adds `docs-index` to your PATH and configures the uv cache.
-
 ## Workflow
 
 1. **Check for index:** look for `<docs_root>/search.db`
-2. **If missing, auto-index:** run `docs-index index <docs_root> --incremental` and inform the user (e.g. "Building search index for the first time...")
+2. **If missing → auto-index:** run `docs-index index <docs_root> --incremental` and inform the user (e.g. "Building search index for the first time...")
 3. **Search:** run `docs-index search <docs_root> "<query>" --limit N`
 4. **Read** the returned file paths to answer the question
 5. **Refine** with `Grep` or additional searches if initial results are insufficient
 
 ## docs-index CLI reference
+
+### Installation
+
+Source the facility detection script to add `docs-index` to PATH (auto-detects S3DF vs OLCF):
+
+```bash
+SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+source "$SKILL_DIR/facility-env.sh" 2>/dev/null || true
+```
+
+If `docs-index` is not found after sourcing, tell the user to set `DOCS_SEARCH_BIN` to the directory containing `docs-index` and `uv`.
 
 Requires `uv` (no other dependencies). Verify: `docs-index --help`
 
