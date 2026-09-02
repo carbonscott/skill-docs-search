@@ -1,3 +1,34 @@
 #!/bin/bash
+# Launch docs-index.py through the SHARED uv, never a personal ~/.local/bin/uv.
+#
+# Resolution order:
+#   1. $SCRIPT_DIR/uv      - the deployed layout: this file lands in
+#                            /sdf/group/lcls/ds/dm/apps/dev/bin/ where the shared uv sits beside it.
+#   2. $DOCS_SEARCH_BIN/uv - set by facility-env.sh site detection
+#                            (S3DF -> /sdf/group/lcls/ds/dm/apps/dev/bin, OLCF -> /ccs/home/cwang31/.local/bin).
+#   3. uv on PATH          - last resort, for a caller that already exported the shared bin,
+#                            and the only case off-site.
+set -u
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec uv run --script "$SCRIPT_DIR/docs-index.py" "$@"
+
+# facility-env.sh sits beside SKILL.md, one level above bin/ and scripts/. It is
+# absent once this file is deployed into dev/bin/, where case 1 already applies.
+if [ -z "${DOCS_SEARCH_BIN:-}" ] && [ -f "$SCRIPT_DIR/../facility-env.sh" ]; then
+    . "$SCRIPT_DIR/../facility-env.sh"
+fi
+
+UV=""
+for candidate in "$SCRIPT_DIR/uv" "${DOCS_SEARCH_BIN:-}/uv"; do
+    if [ -x "$candidate" ]; then UV="$candidate"; break; fi
+done
+[ -n "$UV" ] || UV="$(command -v uv || true)"
+
+if [ -z "$UV" ]; then
+    echo "docs-index: no uv found." >&2
+    echo "  Expected the shared uv beside this script, or at \$DOCS_SEARCH_BIN/uv" >&2
+    echo "  (S3DF: /sdf/group/lcls/ds/dm/apps/dev/bin/uv)." >&2
+    echo "  Set DOCS_SEARCH_BIN to the directory holding docs-index and uv." >&2
+    exit 127
+fi
+
+exec "$UV" run --script "$SCRIPT_DIR/docs-index.py" "$@"
