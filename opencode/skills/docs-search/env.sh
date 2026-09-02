@@ -5,6 +5,13 @@
 
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Facility detection: sets DOCS_SEARCH_BIN to the directory holding the shared
+# uv and puts it on PATH, so docs-index resolves uv without a personal
+# ~/.local/bin/uv. Off-site it sets nothing and PATH's own uv is used.
+if [ -f "$SKILL_DIR/facility-env.sh" ]; then
+    source "$SKILL_DIR/facility-env.sh"
+fi
+
 # Add docs-index to PATH
 export PATH="$SKILL_DIR/bin:$PATH"
 

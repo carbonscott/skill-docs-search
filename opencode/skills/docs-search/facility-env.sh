@@ -11,6 +11,7 @@ elif [ -d /lustre/orion ]; then
     export DOCS_SEARCH_BIN="${DOCS_SEARCH_BIN:-/ccs/home/cwang31/.local/bin}"
 fi
 
-if [ -n "$DOCS_SEARCH_BIN" ]; then
+# ${..:-} so the wrappers, which run under `set -u`, can source this off-site.
+if [ -n "${DOCS_SEARCH_BIN:-}" ]; then
     export PATH="$DOCS_SEARCH_BIN:$PATH"
 fi

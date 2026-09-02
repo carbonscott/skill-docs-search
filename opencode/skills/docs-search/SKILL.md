@@ -28,16 +28,17 @@ Use `docs-index search` for **discovery**, then `Read` the top results. Use `Gre
 
 ### Installation
 
-Source the facility detection script to add `docs-index` to PATH (auto-detects S3DF vs OLCF):
+Source the skill environment to put `docs-index` and the facility's shared `uv` on PATH (auto-detects S3DF vs OLCF). Do it in the *same* bash command as the query — each bash command runs in a fresh shell:
 
 ```bash
-SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-source "$SKILL_DIR/facility-env.sh" 2>/dev/null || true
+source /path/to/this/skill/env.sh && docs-index --help
 ```
+
+`env.sh` is in the same directory as this `SKILL.md`; use the actual path you read this file from. It sources `facility-env.sh` for the site detection, so exporting `DOCS_SEARCH_BIN` beforehand still overrides the detected directory.
 
 If `docs-index` is not found after sourcing, tell the user to set `DOCS_SEARCH_BIN` to the directory containing `docs-index` and `uv`.
 
-Requires `uv` (no other dependencies). Verify: `docs-index --help`
+Requires `uv` (no other dependencies).
 
 ### Subcommands
 
